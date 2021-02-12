@@ -20,22 +20,6 @@ namespace Lumina
 			return new ExcelSheetViewModel<TViewModel, TExcelRow>(self);
 		}
 
-		public static void GetModel(ulong val, bool isWeapon, out ushort modelSet, out ushort modelBase, out ushort modelVariant)
-		{
-			if (isWeapon)
-			{
-				modelSet = (ushort)val;
-				modelBase = (ushort)(val >> 16);
-				modelVariant = (ushort)(val >> 32);
-			}
-			else
-			{
-				modelSet = 0;
-				modelBase = (ushort)val;
-				modelVariant = (ushort)(val >> 16);
-			}
-		}
-
 		public static ImageSource GetImage(this LuminaMain self, uint imageId)
 		{
 			return self.GetImage((int)imageId);

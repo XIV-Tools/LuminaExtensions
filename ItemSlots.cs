@@ -26,5 +26,8 @@ namespace LuminaExtensions
 		SoulCrystal = 8192,
 
 		Rings = RightRing | LeftRing,
+		Equipment = Head | Body | Hands | Waist | Legs | Feet,
+		Accessories = Ears | Neck | Wrists | Rings,
+		Weapons = MainHand | OffHand,
 	}
 }
