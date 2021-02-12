@@ -3,6 +3,7 @@
 
 namespace LuminaExtensions.Excel
 {
+	using System;
 	using System.Windows.Media;
 	using Lumina;
 	using Lumina.Excel.GeneratedSheets;
@@ -26,8 +27,8 @@ namespace LuminaExtensions.Excel
 		{
 			this.classJob = this.Value.ClassJobCategory.Value;
 
-			LuminaMainExtensions.GetModel(item.ModelMain, this.IsWeapon, out this.modelSet, out this.modelBase, out this.modelVariant);
-			LuminaMainExtensions.GetModel(item.ModelSub, this.IsWeapon, out this.subModelSet, out this.subModelBase, out this.subModelVariant);
+			this.GetModel(true, out this.modelSet, out this.modelBase, out this.modelVariant);
+			this.GetModel(false, out this.subModelSet, out this.subModelBase, out this.subModelVariant);
 
 			EquipSlotCategory equip = this.Value.EquipSlotCategory.Value;
 			this.FitsInSlots = ItemSlots.None;
@@ -53,11 +54,42 @@ namespace LuminaExtensions.Excel
 
 		public ItemSlots FitsInSlots { get; private set; }
 
-		public bool IsWeapon => this.FitsInSlot(ItemSlots.MainHand) || this.FitsInSlot(ItemSlots.OffHand);
+		public bool IsWeapon => this.FitsInSlot(ItemSlots.MainHand)
+			|| this.FitsInSlot(ItemSlots.OffHand);
+
+		public bool IsEquipment => this.FitsInSlot(ItemSlots.Head)
+			|| this.FitsInSlot(ItemSlots.Body)
+			|| this.FitsInSlot(ItemSlots.Hands)
+			|| this.FitsInSlot(ItemSlots.Legs)
+			|| this.FitsInSlot(ItemSlots.Feet);
+
+		public bool IsAccessory => this.FitsInSlot(ItemSlots.Ears)
+			|| this.FitsInSlot(ItemSlots.Neck)
+			|| this.FitsInSlot(ItemSlots.Wrists)
+			|| this.FitsInSlot(ItemSlots.LeftRing)
+			|| this.FitsInSlot(ItemSlots.RightRing);
 
 		public bool FitsInSlot(ItemSlots slot)
 		{
 			return this.FitsInSlots.HasFlag(slot);
+		}
+
+		private void GetModel(bool main, out ushort modelSet, out ushort modelBase, out ushort modelVariant)
+		{
+			ulong val = main ? this.Value.ModelMain : this.Value.ModelSub;
+
+			if (this.IsWeapon)
+			{
+				modelSet = (ushort)val;
+				modelBase = (ushort)(val >> 16);
+				modelVariant = (ushort)(val >> 32);
+			}
+			else
+			{
+				modelSet = 0;
+				modelBase = (ushort)val;
+				modelVariant = (ushort)(val >> 16);
+			}
 		}
 
 		private void AddSlotIfFits(ItemSlots slot, EquipSlotCategory equip)
