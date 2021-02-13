@@ -6,7 +6,7 @@ namespace Lumina.Data.Files
 	using System.Collections.Generic;
 	using System.Text;
 	using LuminaExtensions.Files.Mtrl;
-	using SharpDX;
+	using LuminaExtensions.Types;
 
 	public class MtrlFile : FileResource
 	{
