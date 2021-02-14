@@ -65,65 +65,65 @@ namespace Lumina.Data.Files
 		/// <summary>
 		/// Gets or sets a list containing the Texture Path offsets.
 		/// </summary>
-		public List<int> TexturePathOffsetList { get; set; }
+		public List<int> TexturePathOffsetList { get; set; } = new List<int>();
 
 		/// <summary>
 		/// Gets or sets a list containing the Texture Path Unknowns.
 		/// </summary>
-		public List<short> TexturePathUnknownList { get; set; }
+		public List<short> TexturePathUnknownList { get; set; } = new List<short>();
 
 		/// <summary>
 		/// Gets or sets a list containing the Map Path offsets.
 		/// </summary>
-		public List<int> MapPathOffsetList { get; set; }
+		public List<int> MapPathOffsetList { get; set; } = new List<int>();
 
 		/// <summary>
 		/// Gets or sets a list containing the Map Path Unknowns.
 		/// </summary>
-		public List<short> MapPathUnknownList { get; set; }
+		public List<short> MapPathUnknownList { get; set; } = new List<short>();
 
 		/// <summary>
 		/// Gets or sets a list containing the ColorSet Path offsets.
 		/// </summary>
-		public List<int> ColorSetPathOffsetList { get; set; }
+		public List<int> ColorSetPathOffsetList { get; set; } = new List<int>();
 
 		/// <summary>
 		/// Gets or sets a list containing the ColorSet Path Unknowns.
 		/// </summary>
-		public List<short> ColorSetPathUnknownList { get; set; }
+		public List<short> ColorSetPathUnknownList { get; set; } = new List<short>();
 
 		/// <summary>
 		/// Gets or sets a list containing the Texture Path strings.
 		/// </summary>
-		public List<string> TexturePaths { get; set; }
+		public List<string> TexturePaths { get; set; } = new List<string>();
 
 		/// <summary>
 		/// Gets or sets a list containing the Map Path strings.
 		/// </summary>
-		public List<string> MapPathList { get; set; }
+		public List<string> MapPathList { get; set; } = new List<string>();
 
 		/// <summary>
 		/// Gets or sets a list containing the ColorSet Path strings.
 		/// </summary>
-		public List<string> ColorSetPathList { get; set; }
+		public List<string> ColorSetPathList { get; set; } = new List<string>();
 
 		/// <summary>
 		/// Gets or sets the name of the shader used by the item.
 		/// </summary>
-		public string Shader { get; set; }
+		public string? Shader { get; set; }
 
-		public byte[] Unknown2 { get; set; }
+		public byte[]? Unknown2 { get; set; }
 		public ushort Unknown3 { get; set; }
 
 		/// <summary>
 		/// Gets or sets the list of half floats containing the ColorSet data.
 		/// </summary>
-		public List<Half> ColorSetData { get; set; }
+		public List<Half> ColorSetData { get; set; } = new List<Half>();
 
 		/// <summary>
 		/// Gets or sets the byte array containing the extra ColorSet data.
 		/// </summary>
-		public byte[] ColorSetDyeData { get; set; }
+		public byte[]? ColorSetDyeData { get; set; }
 
 		/// <summary>
 		/// Gets or sets the shader number used by the item.
@@ -137,17 +137,17 @@ namespace Lumina.Data.Files
 		/// <summary>
 		/// Gets or sets the list of Type 1 data structures.
 		/// </summary>
-		public List<TextureUsageStruct> TextureUsageList { get; set; }
+		public List<TextureUsageStruct> TextureUsageList { get; set; } = new List<TextureUsageStruct>();
 
 		/// <summary>
 		/// Gets or sets the list of Type 2 data structures.
 		/// </summary>
-		public List<ShaderParameterStruct> ShaderParameterList { get; set; }
+		public List<ShaderParameterStruct> ShaderParameterList { get; set; } = new List<ShaderParameterStruct>();
 
 		/// <summary>
 		/// Gets or sets the list of Parameter data structures.
 		/// </summary>
-		public List<TextureDescriptorStruct> TextureDescriptorList { get; set; }
+		public List<TextureDescriptorStruct> TextureDescriptorList { get; set; } = new List<TextureDescriptorStruct>();
 
 		/// <summary>
 		/// Gets the number of type 1 data sturctures.
@@ -190,6 +190,9 @@ namespace Lumina.Data.Files
 				int size = 0;
 				this.ShaderParameterList.ForEach(x =>
 				{
+					if (x.Args == null)
+						return;
+
 					size += x.Args.Count * 4;
 				});
 

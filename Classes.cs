@@ -107,7 +107,7 @@ namespace LuminaExtensions
 			throw new Exception("No abbreviation for class: " + job);
 		}
 
-		public static string GetName(this Classes job)
+		public static string? GetName(this Classes job)
 		{
 			switch (job)
 			{
@@ -289,7 +289,7 @@ namespace LuminaExtensions
 			}
 			else if (selected.Count == 1)
 			{
-				string name = selected[0].GetName();
+				string? name = selected[0].GetName();
 
 				if (name == null)
 					throw new Exception("Faield to get name of class: " + selected[0]);

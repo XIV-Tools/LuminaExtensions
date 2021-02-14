@@ -86,6 +86,6 @@ namespace LuminaExtensions.Files.Mtrl
 		public MtrlShaderParameterId ParameterID { get; set; }
 		public short Offset { get; set; }
 		public short Size { get; set; }
-		public List<float> Args { get; set; }
+		public List<float>? Args { get; set; }
 	}
 }

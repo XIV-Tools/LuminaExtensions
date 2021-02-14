@@ -3,12 +3,9 @@
 
 namespace Lumina
 {
-	using System.Windows.Media;
-	using System.Windows.Media.Imaging;
-	using global::Lumina.Data.Files;
 	using global::Lumina.Excel;
-	using global::Lumina.Extensions;
 	using LuminaExtensions.Excel;
+
 	using LuminaMain = global::Lumina.Lumina;
 
 	public static class LuminaMainExtensions
@@ -20,18 +17,7 @@ namespace Lumina
 			return new ExcelSheetViewModel<TViewModel, TExcelRow>(self);
 		}
 
-		public static ImageSource GetImage(this LuminaMain self, uint imageId)
-		{
-			return self.GetImage((int)imageId);
-		}
-
-		public static ImageSource GetImage(this LuminaMain self, int imageId)
-		{
-			TexFile tex = self.GetIcon(imageId);
-			return tex.GetImage();
-		}
-
-		public static ImageSource GetImage(this TexFile self)
+		/*public static ImageSource GetImage(this TexFile self)
 		{
 			if (self == null)
 				return null;
@@ -40,6 +26,6 @@ namespace Lumina
 			bmp.Freeze();
 
 			return bmp;
-		}
+		}*/
 	}
 }

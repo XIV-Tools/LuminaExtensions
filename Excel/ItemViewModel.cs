@@ -4,7 +4,6 @@
 namespace LuminaExtensions.Excel
 {
 	using System;
-	using System.Windows.Media;
 	using Lumina;
 	using Lumina.Excel.GeneratedSheets;
 
@@ -41,7 +40,7 @@ namespace LuminaExtensions.Excel
 
 		public string Name => this.Value.Name;
 		public string Description => this.Value.Description;
-		public ImageSource Icon => this.Lumina.GetImage(this.Value.Icon);
+		public ushort Icon => this.Value.Icon;
 		public ushort ModelSet => this.modelSet;
 		public ushort ModelBase => this.modelBase;
 		public ushort ModelVariant => this.modelVariant;

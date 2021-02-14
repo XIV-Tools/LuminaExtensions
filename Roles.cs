@@ -18,7 +18,7 @@ namespace LuminaExtensions
 	#pragma warning disable SA1649 // File name should match first type name
 	public static class RolesExtensions
 	{
-		private static Dictionary<Roles, List<Classes>> classLookup;
+		private static Dictionary<Roles, List<Classes>>? classLookup;
 
 		public static List<Classes> GetClasses(this Roles role)
 		{
