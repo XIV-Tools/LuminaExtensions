@@ -30,4 +30,27 @@ namespace LuminaExtensions
 		Accessories = Ears | Neck | Wrists | Rings,
 		Weapons = MainHand | OffHand,
 	}
+
+	#pragma warning disable SA1649
+	public static class ItemSlotsExtensions
+	{
+		public static string ToAbbreviation(this ItemSlots self)
+		{
+			switch (self)
+			{
+				case ItemSlots.Head: return "met";
+				case ItemSlots.Body: return "top";
+				case ItemSlots.Hands: return "glv";
+				case ItemSlots.Legs: return "dwn";
+				case ItemSlots.Feet: return "sho";
+				case ItemSlots.Ears: return "ear";
+				case ItemSlots.Neck: return "nek";
+				case ItemSlots.Wrists: return "wrs";
+				case ItemSlots.RightRing: return "rir";
+				case ItemSlots.LeftRing: return "ril";
+			}
+
+			throw new Exception($"Missing abbreviation for slot: {self}");
+		}
+	}
 }
