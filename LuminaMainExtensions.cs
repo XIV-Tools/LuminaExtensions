@@ -16,16 +16,5 @@ namespace Lumina
 		{
 			return new ExcelSheetViewModel<TViewModel, TExcelRow>(self);
 		}
-
-		/*public static ImageSource GetImage(this TexFile self)
-		{
-			if (self == null)
-				return null;
-
-			BitmapSource bmp = BitmapSource.Create(self.Header.Width, self.Header.Height, 96, 96, PixelFormats.Bgra32, null, self.ImageData, self.Header.Width * 4);
-			bmp.Freeze();
-
-			return bmp;
-		}*/
 	}
 }

@@ -5,8 +5,9 @@ namespace LuminaExtensions.Excel
 {
 	using System;
 	using Lumina;
+	using Lumina.Data.Files;
 	using Lumina.Excel.GeneratedSheets;
-
+	using Lumina.Extensions;
 	using LuminaMain = global::Lumina.Lumina;
 
 	public class ItemViewModel : ExcelRowViewModel<Item>
@@ -40,7 +41,7 @@ namespace LuminaExtensions.Excel
 
 		public string Name => this.Value.Name;
 		public string Description => this.Value.Description;
-		public ushort Icon => this.Value.Icon;
+		public TexFile Icon => this.Lumina.GetIcon(this.Value.Icon);
 		public ushort ModelSet => this.modelSet;
 		public ushort ModelBase => this.modelBase;
 		public ushort ModelVariant => this.modelVariant;
