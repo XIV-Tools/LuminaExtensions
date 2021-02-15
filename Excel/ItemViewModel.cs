@@ -12,12 +12,12 @@ namespace LuminaExtensions.Excel
 
 	public class ItemViewModel : ExcelRowViewModel<Item>
 	{
-		private readonly ushort modelSet;
-		private readonly ushort modelBase;
+		private readonly ushort modelSet2;
+		private readonly ushort modelset;
 		private readonly ushort modelVariant;
 
+		private readonly ushort subModelSet2;
 		private readonly ushort subModelSet;
-		private readonly ushort subModelBase;
 		private readonly ushort subModelVariant;
 
 		private readonly ClassJobCategory classJob;
@@ -27,8 +27,8 @@ namespace LuminaExtensions.Excel
 		{
 			this.classJob = this.Value.ClassJobCategory.Value;
 
-			this.GetModel(true, out this.modelSet, out this.modelBase, out this.modelVariant);
-			this.GetModel(false, out this.subModelSet, out this.subModelBase, out this.subModelVariant);
+			this.GetModel(true, out this.modelSet2, out this.modelset, out this.modelVariant);
+			this.GetModel(false, out this.subModelSet2, out this.subModelSet, out this.subModelVariant);
 
 			EquipSlotCategory equip = this.Value.EquipSlotCategory.Value;
 			this.FitsInSlots = ItemSlots.None;
@@ -42,12 +42,12 @@ namespace LuminaExtensions.Excel
 		public string Name => this.Value.Name;
 		public string Description => this.Value.Description;
 		public TexFile Icon => this.Lumina.GetIcon(this.Value.Icon);
-		public ushort ModelSet => this.modelSet;
-		public ushort ModelBase => this.modelBase;
+		public ushort ModelSet2 => this.modelSet2;
+		public ushort ModelSet => this.modelset;
 		public ushort ModelVariant => this.modelVariant;
 		public bool HasSubModel => this.Value.ModelSub != 0;
+		public ushort SubModelSet2 => this.subModelSet2;
 		public ushort SubModelSet => this.subModelSet;
-		public ushort SubModelBase => this.subModelBase;
 		public ushort SubModelVariant => this.subModelVariant;
 		public ClassJobCategory ClassJob => this.classJob;
 		public Classes EquipableClasses => this.classJob.ToFlags();
@@ -74,20 +74,20 @@ namespace LuminaExtensions.Excel
 			return this.FitsInSlots.HasFlag(slot);
 		}
 
-		private void GetModel(bool main, out ushort modelSet, out ushort modelBase, out ushort modelVariant)
+		private void GetModel(bool main, out ushort modelSet2, out ushort modelSet, out ushort modelVariant)
 		{
 			ulong val = main ? this.Value.ModelMain : this.Value.ModelSub;
 
 			if (this.IsWeapon)
 			{
-				modelSet = (ushort)val;
-				modelBase = (ushort)(val >> 16);
+				modelSet2 = (ushort)val;
+				modelSet = (ushort)(val >> 16);
 				modelVariant = (ushort)(val >> 32);
 			}
 			else
 			{
-				modelSet = 0;
-				modelBase = (ushort)val;
+				modelSet2 = 0;
+				modelSet = (ushort)val;
 				modelVariant = (ushort)(val >> 16);
 			}
 		}

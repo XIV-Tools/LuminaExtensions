@@ -52,5 +52,25 @@ namespace LuminaExtensions
 
 			throw new Exception($"Missing abbreviation for slot: {self}");
 		}
+
+		public static int ToImcIndex(this ItemSlots self)
+		{
+			switch (self)
+			{
+				case ItemSlots.Head: return 0;
+				case ItemSlots.Body: return 1;
+				case ItemSlots.Hands: return 2;
+				case ItemSlots.Legs: return 3;
+				case ItemSlots.Feet: return 4;
+
+				case ItemSlots.Ears: return 0;
+				case ItemSlots.Neck: return 1;
+				case ItemSlots.Wrists: return 2;
+				case ItemSlots.RightRing: return 3;
+				case ItemSlots.LeftRing: return 4;
+			}
+
+			throw new Exception($"Invalid slot for Imc: {self}");
+		}
 	}
 }
