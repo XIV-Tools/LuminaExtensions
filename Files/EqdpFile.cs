@@ -9,39 +9,63 @@ namespace LuminaExtensions.Files
 
 	public class EqdpFile : FileResource
 	{
-		// Full EQDP entries are 2 bytes long.
-		public const int EquipmentDeformerParameterEntrySize = 2;
+		[Flags]
+		private enum Flags : ushort
+		{
+			None = 0,
 
-		public EquipmentDeformationParameter GetParameters(int setId, bool accessory, ItemSlots slot)
+			HeadOrEars = 1,
+			HeadOrEarsB = 2,
+			BodyOrNeck = 4,
+			BodyOrNeckB = 8,
+			HandsOrWrists = 16,
+			HandsOrWristsB = 32,
+			LegsOrRightRing = 64,
+			LegsOrRightRingB = 128,
+			FeetOrLeftRing = 256,
+			FeetOrLeftRingB = 512,
+			Unknown = 1024,
+
+			All = HeadOrEars | HeadOrEarsB | BodyOrNeck | BodyOrNeckB | HandsOrWrists | HandsOrWristsB | LegsOrRightRing | LegsOrRightRingB | FeetOrLeftRing | FeetOrLeftRingB,
+		}
+
+		public bool IsSet(int setId, ItemSlots slot)
 		{
 			int offset = this.GetEntryOffset(setId);
-			ushort param = 0;
+
+			if (offset <= 0)
+				return false;
 
 			if (offset >= 0)
 			{
 				this.Reader.BaseStream.Seek(offset, SeekOrigin.Begin);
-				param = this.Reader.ReadUInt16();
-			}
+				Flags flags = (Flags)this.Reader.ReadUInt16();
 
-			int index = slot.ToImcIndex();
-
-			// this is some crazy bit-shifting nonsense that I am not going to touch.
-			for (int idx = 0; idx < 5; idx++)
-			{
-				EquipmentDeformationParameter? entry = new EquipmentDeformationParameter();
-
-				entry.bit0 = (param & 1) != 0;
-				param = (ushort)(param >> 1);
-				entry.bit1 = (param & 1) != 0;
-				param = (ushort)(param >> 1);
-
-				if (idx == index)
-				{
-					return entry;
-				}
+				Flags flag = SlotToFlag(slot);
+				return flags.HasFlag(flag);
 			}
 
 			throw new Exception($"Failed to get deformation parameter for set: {setId} and slot {slot}");
+		}
+
+		private static Flags SlotToFlag(ItemSlots slot)
+		{
+			switch (slot)
+			{
+				case ItemSlots.None: return Flags.None;
+				case ItemSlots.Head: return Flags.HeadOrEars;
+				case ItemSlots.Body: return Flags.BodyOrNeck;
+				case ItemSlots.Hands: return Flags.HandsOrWrists;
+				case ItemSlots.Legs: return Flags.LegsOrRightRing;
+				case ItemSlots.Feet: return Flags.FeetOrLeftRing;
+				case ItemSlots.Ears: return Flags.HeadOrEars;
+				case ItemSlots.Neck: return Flags.BodyOrNeck;
+				case ItemSlots.Wrists: return Flags.HandsOrWrists;
+				case ItemSlots.RightRing: return Flags.LegsOrRightRing;
+				case ItemSlots.LeftRing: return Flags.FeetOrLeftRing;
+			}
+
+			throw new Exception($"Unsupported item slot: {slot}");
 		}
 
 		/// <summary>
@@ -73,21 +97,12 @@ namespace LuminaExtensions.Files
 			int fullHeaderLength = basicHeaderSize + (blockHeaderSize * blockCount);
 
 			// Start of the data block our entry lives in.
-			int blockStart = fullHeaderLength + (baseDataOffset * EquipmentDeformerParameterEntrySize);
+			int blockStart = fullHeaderLength + (baseDataOffset * 2);
 
 			// Then move the appropriate number of entries in.
-			int dataOffset = blockStart + (subEntryId * EquipmentDeformerParameterEntrySize);
+			int dataOffset = blockStart + (subEntryId * 2);
 
 			return dataOffset;
-		}
-
-		/// <summary>
-		/// Class representing an Equipment Deformation parameter for a given race/slot.
-		/// </summary>
-		public class EquipmentDeformationParameter
-		{
-			public bool bit0;
-			public bool bit1;
 		}
 	}
 }
