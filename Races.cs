@@ -37,7 +37,11 @@ namespace LuminaExtensions
 	#pragma warning disable SA1649
 	public static class RaceTribeExtensions
 	{
-		public static readonly ushort[] All = GetAllRaceTribes();
+		public static string ToKey(this RaceTribes self, RaceTypes type)
+		{
+			ushort id = self.ToId(type);
+			return "c" + id.ToString().PadLeft(4, '0');
+		}
 
 		public static ushort ToId(this RaceTribes self, RaceTypes type)
 		{
@@ -45,20 +49,6 @@ namespace LuminaExtensions
 				throw new Exception("Npc race can not be player");
 
 			return (ushort)((ushort)self + (ushort)type);
-		}
-
-		private static ushort[] GetAllRaceTribes()
-		{
-			List<ushort> values = new List<ushort>();
-			foreach (RaceTribes val in Enum.GetValues(typeof(RaceTribes)))
-			{
-				if (val < RaceTribes.NpcMale)
-					values.Add(val.ToId(RaceTypes.Player));
-
-				values.Add(val.ToId(RaceTypes.Npc));
-			}
-
-			return values.ToArray();
 		}
 	}
 }

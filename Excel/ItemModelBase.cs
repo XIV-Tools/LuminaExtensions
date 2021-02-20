@@ -23,6 +23,8 @@ namespace LuminaExtensions.Excel
 		public ushort Set { get; protected set; }
 		public ushort ImcVariant { get; protected set; }
 
+		public abstract string GetModelPath(RaceTribes raceTribe, RaceTypes raceType, ItemSlots slot);
+
 		protected abstract string GetSetKey();
 		protected abstract string GetImcFilePath();
 	}
@@ -32,6 +34,13 @@ namespace LuminaExtensions.Excel
 		public EquipmentModel(ulong dat)
 			: base(dat)
 		{
+		}
+
+		public override string GetModelPath(RaceTribes raceTribe, RaceTypes raceType, ItemSlots slot)
+		{
+			string raceKey = raceTribe.ToKey(raceType);
+			string slotKey = slot.ToAbbreviation();
+			return $"chara/equipment/{this.SetKey}/model/{raceKey}{this.SetKey}_{slotKey}.mdl";
 		}
 
 		protected override string GetImcFilePath()
@@ -52,6 +61,13 @@ namespace LuminaExtensions.Excel
 		{
 		}
 
+		public override string GetModelPath(RaceTribes raceTribe, RaceTypes raceType, ItemSlots slot)
+		{
+			string raceKey = raceTribe.ToKey(raceType);
+			string slotKey = slot.ToAbbreviation();
+			return $"chara/accessory/{this.SetKey}/model/{raceKey}{this.SetKey}_{slotKey}.mdl";
+		}
+
 		protected override string GetImcFilePath()
 		{
 			return $"chara/accessory/{this.SetKey}/{this.SetKey}.imc";
@@ -70,6 +86,17 @@ namespace LuminaExtensions.Excel
 		{
 			this.Set = (ushort)(dat >> 16);
 			this.ImcVariant = (ushort)(dat >> 32);
+		}
+
+		public override string GetModelPath(RaceTribes raceTribe, RaceTypes raceType, ItemSlots slot)
+		{
+			// secondary id might be the model variant?
+			ushort secondaryId = 0000; // ?
+			string secondaryIdStr4 = secondaryId.ToString().PadLeft(4, '0');
+
+			string raceKey = raceTribe.ToKey(raceType);
+			string slotKey = slot.ToAbbreviation();
+			return $"chara/weapon/{this.SetKey}/obj/body/b{secondaryIdStr4}/model/{raceKey}b{secondaryIdStr4}_{slotKey}.mdl";
 		}
 
 		protected override string GetImcFilePath()
