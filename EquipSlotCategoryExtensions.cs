@@ -29,5 +29,22 @@ namespace Lumina.Excel.GeneratedSheets
 
 			return false;
 		}
+
+		public static ItemSlots ToFlags(this EquipSlotCategory self)
+		{
+			ItemSlots slots = ItemSlots.None;
+
+			for (int i = 1; i < (int)ItemSlots.SoulCrystal; i *= 2)
+			{
+				ItemSlots slot = (ItemSlots)i;
+
+				if (self.Contains(slot))
+				{
+					slots |= slot;
+				}
+			}
+
+			return slots;
+		}
 	}
 }
