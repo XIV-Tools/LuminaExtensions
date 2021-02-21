@@ -1,10 +1,11 @@
 ﻿// © XIV-Tools.
 // Licensed under the MIT license.
 
-namespace Lumina.Data.Files
+namespace LuminaExtensions.Files
 {
 	using System.Collections.Generic;
 	using System.Text;
+	using Lumina.Data;
 	using LuminaExtensions.Files.Mtrl;
 	using LuminaExtensions.Types;
 
