@@ -4,34 +4,37 @@
 namespace LuminaExtensions
 {
 	using System;
-	using System.Collections.Generic;
+	using System.Text.RegularExpressions;
 
 	public enum RaceTribes : ushort
 	{
-		HyurMidlanderMale = 0100,
-		HyurMidlanderFemale = 0200,
-		HyurHighlanderMale = 0300,
-		HyurHighlanderFemale = 0400,
-		ElezenMale = 0500,
-		ElezenFemale = 0600,
-		MiqoteMale = 0700,
-		MiqoteFemale = 0800,
-		RoegadynMale = 0900,
-		RoegadynFemale = 1000,
-		LalafellMale = 1100,
-		LalafellFemale = 1200,
-		AuRaMale = 1300,
-		AuRaFemale = 1400,
-		Hrothgar = 1500,
-		Viera = 1800,
-		NpcMale = 9100,
-		NpcFemale = 9200,
+		HyurMidlanderMale = 1,
+		HyurMidlanderFemale = 2,
+		HyurHighlanderMale = 3,
+		HyurHighlanderFemale = 4,
+		ElezenMale = 5,
+		ElezenFemale = 6,
+		MiqoteMale = 7,
+		MiqoteFemale = 8,
+		RoegadynMale = 9,
+		RoegadynFemale = 10,
+		LalafellMale = 11,
+		LalafellFemale = 12,
+		AuRaMale = 13,
+		AuRaFemale = 14,
+		HrothgarMale = 15,
+		HrothgarFemale = 16, // Asumption
+		VieraMale = 17, // Assumption
+		VieraFemale = 18,
+		NpcMale = 91,
+		NpcFemale = 92,
 	}
 
+	// Wonder what 02 and 03 would be?
 	public enum RaceTypes : ushort
 	{
-		Player = 01,
-		Npc = 04,
+		Player = 1,
+		Npc = 4,
 	}
 
 	#pragma warning disable SA1649
@@ -43,12 +46,16 @@ namespace LuminaExtensions
 			return "c" + id.ToString().PadLeft(4, '0');
 		}
 
+		public static string ToDisplayName(this RaceTribes self)
+		{
+			// TODO: actually look this up from the game data to get localised versions
+			// Insert spaces before caps
+			return Regex.Replace(self.ToString(), "(\\B[A-Z])", " $1");
+		}
+
 		public static ushort ToId(this RaceTribes self, RaceTypes type)
 		{
-			if ((self == RaceTribes.NpcMale || self == RaceTribes.NpcFemale) && type == RaceTypes.Player)
-				throw new Exception("Npc race can not be player");
-
-			return (ushort)((ushort)self + (ushort)type);
+			return (ushort)(((ushort)self * 100) + (ushort)type);
 		}
 	}
 }
