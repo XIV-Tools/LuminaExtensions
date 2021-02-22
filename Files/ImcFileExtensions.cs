@@ -33,7 +33,7 @@ namespace Lumina.Data.Files
 			ImcFile.ImageChangeParts parts = self.GetPart(slot);
 			variant = default;
 
-			if (variantId < 0 || variantId > parts.Variants.Length)
+			if (variantId < 0 || variantId >= parts.Variants.Length)
 				return false;
 
 			variant = parts.Variants[variantId];

@@ -10,6 +10,7 @@
 
   <ItemGroup>
 	<PackageReference Include="Lumina.Excel" Version="5.40.0" />
+	<PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
 	<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
 	  <PrivateAssets>all</PrivateAssets>
 	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
