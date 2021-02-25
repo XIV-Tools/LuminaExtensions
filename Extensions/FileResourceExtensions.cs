@@ -3,7 +3,6 @@
 
 namespace Lumina.Data
 {
-	using System;
 	using System.IO;
 	using LuminaExtensions.Converters;
 
@@ -19,10 +18,10 @@ namespace Lumina.Data
 			return ConvertersUtil.GetConverter(self.GetType(), extension);
 		}
 
-		public static bool ConvertFile(this FileResource self, ConverterBase converter, string path)
+		public static void ConvertFile(this FileResource self, ConverterBase converter, string path)
 		{
 			using FileStream file = File.OpenWrite(path);
-			return converter.Convert(self, file);
+			converter.Convert(self, file);
 		}
 	}
 }

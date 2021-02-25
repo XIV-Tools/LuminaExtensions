@@ -1,22 +1,29 @@
 ﻿// © XIV-Tools.
 // Licensed under the MIT license.
 
+// Special thanks to xivModdingFramework for the initial texture
+// conversion logic upon which this is based.
+// Copyright © 2018 Rafael Gonzalez - All Rights Reserved
 namespace LuminaExtensions.Converters.TexFiles
 {
 	using System;
 	using System.IO;
-	using System.Runtime.CompilerServices;
 	using Lumina.Data.Files;
+	using LuminaExtensions.Files;
 	using SixLabors.ImageSharp;
 	using SixLabors.ImageSharp.Formats.Png;
 	using SixLabors.ImageSharp.PixelFormats;
+	using TeximpNet;
+	using TeximpNet.Compression;
+	using TeximpNet.DDS;
 
-	public class TexToPngConverter : ConverterBase<TexFile>
+	public class TexToPngConverter : TexToDdsConverter
 	{
 		public override string Name => "Image";
-		public override string FileExtension => "png";
+		public override string FileExtension => ".png";
+		public override string ResourceExtension => ".tex";
 
-		public override bool Convert(TexFile source, FileStream destination)
+		public override void Convert(TexFileEx source, Stream destination)
 		{
 			PngEncoder encoder = new PngEncoder();
 			encoder.BitDepth = PngBitDepth.Bit16;
@@ -27,13 +34,34 @@ namespace LuminaExtensions.Converters.TexFiles
 			Image img = Image.LoadPixelData<Bgra32>(source.ImageData, source.Header.Width, source.Header.Height);
 			img.Save(destination, encoder);
 			img.Dispose();
-
-			return true;
 		}
 
-		public override bool ConvertBack(FileStream source, TexFile destination)
+		public override void ConvertBack(Stream source, TexFileEx destination)
 		{
-			throw new NotImplementedException();
+			using Surface surface = Surface.LoadFromStream(source);
+
+			using Compressor compressor = new Compressor();
+			compressor.Input.SetMipmapGeneration(true, destination.Header.MipLevels);
+			compressor.Input.SetData(surface);
+
+			compressor.Compression.Format = destination.Header.Format switch
+			{
+				TexFile.TextureFormat.DXT1 => CompressionFormat.BC1a,
+				TexFile.TextureFormat.DXT5 => CompressionFormat.BC3,
+				TexFile.TextureFormat.A8R8G8B8 => CompressionFormat.BGRA,
+
+				_ => throw new NotSupportedException($"The destination texture format: {destination.Header.Format} is not supported."),
+			};
+
+			compressor.Compression.SetBGRAPixelFormat();
+
+			DDSContainer ddsContainer;
+			compressor.Process(out ddsContainer);
+
+			using MemoryStream ddsStream = new MemoryStream();
+			ddsContainer.Write(ddsStream);
+
+			base.ConvertBack(ddsStream, destination);
 		}
 	}
 }

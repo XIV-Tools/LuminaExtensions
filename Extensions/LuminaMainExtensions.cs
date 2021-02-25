@@ -20,7 +20,7 @@ namespace LuminaExtensions
 				case ".mtrl": return lumina.GetFile<MtrlFile>(path);
 				case ".mdl": return lumina.GetFile<MdlFile>(path);
 				case ".eqdp": return lumina.GetFile<EqdpFile>(path);
-				case ".tex": return lumina.GetFile<TexFile>(path);
+				case ".tex": return lumina.GetFile<TexFileEx>(path);
 			}
 
 			return lumina.GetFile(path);

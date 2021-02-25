@@ -11,9 +11,10 @@ namespace LuminaExtensions.Converters
 	{
 		public abstract string Name { get; }
 		public abstract string FileExtension { get; }
+		public abstract string ResourceExtension { get; }
 
 		public abstract bool CanConvert(Type sourceType);
-		public abstract bool Convert(FileResource source, FileStream destination);
-		public abstract bool ConvertBack(FileStream source, FileResource destination);
+		public abstract void Convert(FileResource source, Stream destination);
+		public abstract void ConvertBack(Stream source, FileResource destination);
 	}
 }
