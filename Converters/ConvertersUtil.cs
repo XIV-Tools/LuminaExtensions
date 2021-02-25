@@ -41,13 +41,34 @@ namespace LuminaExtensions.Converters
 
 			foreach (ConverterBase converter in AllConverters)
 			{
-				if (converter.CanConvert(fileType))
-				{
-					results.Add(converter);
-				}
+				if (!converter.CanConvert(fileType))
+					continue;
+
+				results.Add(converter);
 			}
 
 			return results.ToArray();
+		}
+
+		public static ConverterBase? GetConverter<TFile>(string fileExtension)
+		{
+			return GetConverter(typeof(TFile), fileExtension);
+		}
+
+		public static ConverterBase? GetConverter(Type fileType, string fileExtension)
+		{
+			foreach (ConverterBase converter in AllConverters)
+			{
+				if (!converter.CanConvert(fileType))
+					continue;
+
+				if (converter.FileExtension != fileExtension)
+					continue;
+
+				return converter;
+			}
+
+			return null;
 		}
 	}
 }

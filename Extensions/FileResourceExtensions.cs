@@ -14,6 +14,11 @@ namespace Lumina.Data
 			return ConvertersUtil.GetConverters(self.GetType());
 		}
 
+		public static ConverterBase? GetConverter(this FileResource self, string extension)
+		{
+			return ConvertersUtil.GetConverter(self.GetType(), extension);
+		}
+
 		public static bool ConvertFile(this FileResource self, ConverterBase converter, string path)
 		{
 			using FileStream file = File.OpenWrite(path);
