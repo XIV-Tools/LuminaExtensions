@@ -3,7 +3,7 @@
 
 // Special thanks to xivModdingFramework for the initial texture
 // conversion logic upon which this is based.
-// Copyright © 2018 Rafael Gonzalez - All Rights Reserved
+// xivModdingFramework Copyright © 2018 Rafael Gonzalez - All Rights Reserved
 namespace LuminaExtensions.Converters.TexFiles
 {
 	using System;
@@ -31,7 +31,7 @@ namespace LuminaExtensions.Converters.TexFiles
 			////Span<byte> rawImageData = source.DataSpan.Slice(Unsafe.SizeOf<TexFile.TexHeader>());
 
 			// TODO: Split ImageData based on lods / mips
-			Image img = Image.LoadPixelData<Bgra32>(source.ImageData, source.Header.Width, source.Header.Height);
+			Image img = Image.LoadPixelData<Bgra32>(source.ArgbData, source.Header.Width, source.Header.Height);
 			img.Save(destination, encoder);
 			img.Dispose();
 		}
@@ -39,6 +39,7 @@ namespace LuminaExtensions.Converters.TexFiles
 		public override void ConvertBack(Stream source, TexFileEx destination)
 		{
 			using Surface surface = Surface.LoadFromStream(source);
+			surface.FlipVertically();
 
 			using Compressor compressor = new Compressor();
 			compressor.Input.SetMipmapGeneration(true, destination.Header.MipLevels);
@@ -61,6 +62,7 @@ namespace LuminaExtensions.Converters.TexFiles
 			using MemoryStream ddsStream = new MemoryStream();
 			ddsContainer.Write(ddsStream);
 
+			ddsStream.Seek(0, SeekOrigin.Begin);
 			base.ConvertBack(ddsStream, destination);
 		}
 	}

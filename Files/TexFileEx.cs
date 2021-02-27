@@ -4,72 +4,82 @@
 namespace LuminaExtensions.Files
 {
 	using System;
+	using System.IO;
+	using System.Reflection;
 	using System.Runtime.CompilerServices;
-	using System.Runtime.InteropServices;
-	using Lumina.Data;
 	using Lumina.Data.Files;
 	using Lumina.Data.Parsing.Tex;
 	using Lumina.Extensions;
+	using LuminaExtensions.Extensions;
 
-	public class TexFileEx : FileResource
+	public class TexFileEx : TexFile
 	{
-		public TexHeader Header;
-
-		public int HeaderLength => Unsafe.SizeOf<TexHeader>();
-
-		/// <summary>
-		/// Gets The converted A8R8G8B8 image, in bytes.
-		/// </summary>
-		public byte[]? ImageData { get; private set; }
+		public byte[]? DdsData { get; private set; }
+		public byte[]? ArgbData { get; set; }
 
 		public override void LoadFile()
 		{
-			this.Reader.BaseStream.Position = 0;
-			this.Header = this.Reader.ReadStructure<TexHeader>();
+			base.LoadFile();
 
-			// todo: this isn't correct and reads out the whole data portion as 1 image instead of accounting for lod levels
-			// probably a breaking change to fix this
-			this.ImageData = Convert(this.Header.Format, this.DataSpan.Slice(this.HeaderLength), this.Header.Width, this.Header.Height);
+			this.Reader.BaseStream.Position = 0;
+			this.Header = this.Reader.ReadStructure<TexFile.TexHeader>();
+
+			// TODO: replace current lumina image loader with one that deals with lods correctly.
+			this.DdsData = this.DataSpan.Slice(Unsafe.SizeOf<TexHeader>()).ToArray();
+			this.ArgbData = this.ImageData;
 		}
 
-		public void SetImageData(byte[] data)
+		public override void SaveFile(string path)
 		{
+			////base.SaveFile(path);
 
+			using FileStream fs = File.OpenWrite(path);
+			using BinaryWriter bw = new BinaryWriter(fs);
+			bw.WriteStructure(this.Header);
+			bw.Write(this.DdsData);
+		}
+
+		public void SetDds(byte[] ddsData)
+		{
+			this.DdsData = ddsData;
+
+			Span<byte> span = new Span<byte>(this.DdsData);
+			this.ArgbData = Convert(span, this.Header.Format, this.Header.Width, this.Header.Height);
 		}
 
 		// converts various formats to A8R8G8B8
-		private static byte[] Convert(TexFile.TextureFormat format, Span<byte> src, int width, int height)
+		private static byte[] Convert(Span<byte> src, TextureFormat format, int width, int height)
 		{
 			byte[] dst = new byte[width * height * 4];
 
 			switch (format)
 			{
-				case TexFile.TextureFormat.DXT1:
+				case TextureFormat.DXT1:
 					ProcessDxt1(src, dst, width, height);
 					break;
-				case TexFile.TextureFormat.DXT3:
+				case TextureFormat.DXT3:
 					ProcessDxt3(src, dst, width, height);
 					break;
-				case TexFile.TextureFormat.DXT5:
+				case TextureFormat.DXT5:
 					ProcessDxt5(src, dst, width, height);
 					break;
-				case TexFile.TextureFormat.R16G16B16A16F:
+				case TextureFormat.R16G16B16A16F:
 					ProcessA16R16G16B16_Float(src, dst, width, height);
 					break;
-				case TexFile.TextureFormat.R5G5B5A1:
+				case TextureFormat.R5G5B5A1:
 					ProcessA1R5G5B5(src, dst, width, height);
 					break;
-				case TexFile.TextureFormat.R4G4B4A4:
+				case TextureFormat.R4G4B4A4:
 					ProcessA4R4G4B4(src, dst, width, height);
 					break;
-				case TexFile.TextureFormat.L8:
+				case TextureFormat.L8:
 					ProcessR3G3B2(src, dst, width, height);
 					break;
-				case TexFile.TextureFormat.A8R8G8B8:
+				case TextureFormat.A8R8G8B8:
 					src.CopyTo(dst);
 					break;
 				default:
-					throw new NotImplementedException($"TextureFormat {format.ToString()} is not supported for image conversion.");
+					throw new NotImplementedException($"TextureFormat {format} is not supported for image conversion.");
 			}
 
 			return dst;
@@ -158,19 +168,6 @@ namespace LuminaExtensions.Files
 				dst[(i * 4) + 2] = (byte)(r | (r << 3) | (r << 6));
 				dst[(i * 4) + 3] = 0xFF;
 			}
-		}
-
-		[StructLayout(LayoutKind.Sequential)]
-		public unsafe struct TexHeader
-		{
-			public TexFile.Attribute Type;
-			public TexFile.TextureFormat Format;
-			public ushort Width;
-			public ushort Height;
-			public ushort Depth;
-			public ushort MipLevels;
-			public fixed uint LodOffset[3];
-			public fixed uint OffsetToSurface[13];
 		}
 	}
 }
