@@ -16,10 +16,15 @@ namespace LuminaExtensions.Excel
 			this.ImcFilePath = this.GetImcFilePath();
 		}
 
-		public string ImcFilePath { get; private set; }
+		protected ItemModelBase()
+		{
+			this.ImcFilePath = string.Empty;
+		}
 
-		public string Display => $"{this.SetKey}, v{this.ImcVariant}";
-		public string SetKey { get; private set; } = string.Empty;
+		public string ImcFilePath { get; protected set; }
+
+		public virtual string Display => $"{this.SetKey}, v{this.ImcVariant}";
+		public string SetKey { get; protected set; } = string.Empty;
 		public ushort Set { get; protected set; }
 		public ushort ImcVariant { get; protected set; }
 
@@ -81,31 +86,34 @@ namespace LuminaExtensions.Excel
 
 	public class WeaponModel : ItemModelBase
 	{
+		public ushort SetVaraint = 0;
+
 		public WeaponModel(ulong dat)
-			: base(dat)
+			: base()
 		{
-			this.Set = (ushort)(dat >> 16);
+			this.Set = (ushort)dat;
+			this.SetVaraint = (ushort)(dat >> 16);
 			this.ImcVariant = (ushort)(dat >> 32);
+
+			this.SetKey = this.GetSetKey();
+			this.SetVaraintKey = "b" + this.SetVaraint.ToString().PadLeft(4, '0');
+
+			this.ImcFilePath = this.GetImcFilePath();
 		}
+
+		public string SetVaraintKey { get; protected set; } = string.Empty;
+
+		public override string Display => $"{this.SetKey}, {this.SetVaraintKey}, v{this.ImcVariant}";
 
 		public override string GetModelPath(RaceTribes raceTribe, RaceTypes raceType, ItemSlots slot)
 		{
-			// secondary id might be the model variant?
-			ushort secondaryId = 0000; // ?
-			string secondaryIdStr4 = secondaryId.ToString().PadLeft(4, '0');
-
 			string raceKey = raceTribe.ToKey(raceType);
-			string slotKey = slot.ToAbbreviation();
-			return $"chara/weapon/{this.SetKey}/obj/body/b{secondaryIdStr4}/model/{raceKey}b{secondaryIdStr4}_{slotKey}.mdl";
+			return $"chara/weapon/{this.SetKey}/obj/body/{this.SetVaraintKey}/model/{this.SetKey}{this.SetVaraintKey}.mdl";
 		}
 
 		protected override string GetImcFilePath()
 		{
-			// secondary id might be the model variant?
-			ushort secondaryId = 0000; // ?
-			string secondaryIdStr4 = secondaryId.ToString().PadLeft(4, '0');
-
-			return $"chara/weapon/{this.SetKey}/obj/body/b{secondaryIdStr4}/b{secondaryIdStr4}.imc";
+			return $"chara/weapon/{this.SetKey}/obj/body/{this.SetVaraintKey}/{this.SetVaraintKey}.imc";
 		}
 
 		protected override string GetSetKey()
