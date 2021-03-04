@@ -70,7 +70,8 @@ namespace LuminaExtensions
 				case ItemSlots.LeftRing: return 4;
 			}
 
-			throw new Exception($"Invalid slot for Imc: {self}");
+			return 0;
+			////throw new Exception($"Invalid slot for Imc: {self}");
 		}
 	}
 }

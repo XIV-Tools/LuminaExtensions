@@ -33,6 +33,9 @@ namespace Lumina.Data.Files
 			ImcFile.ImageChangeParts parts = self.GetPart(slot);
 			variant = default;
 
+			// Varaint Id is 0-indexed
+			variantId -= 1;
+
 			if (variantId < 0 || variantId >= parts.Variants.Length)
 				return false;
 
@@ -42,7 +45,7 @@ namespace Lumina.Data.Files
 
 		public static string GetMaterialKey(this ImcFile.ImageChangeData self)
 		{
-			return "v" + (self.MaterialId - 1).ToString().PadLeft(4, '0');
+			return "v" + self.MaterialId.ToString().PadLeft(4, '0');
 		}
 	}
 }
