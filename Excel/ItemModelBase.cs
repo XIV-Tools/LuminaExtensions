@@ -43,6 +43,9 @@ namespace LuminaExtensions.Excel
 
 		public override string GetModelPath(RaceTribes raceTribe, RaceTypes raceType, ItemSlots slot)
 		{
+			if (!slot.IsSlot(ItemSlots.Equipment))
+				return string.Empty;
+
 			string raceKey = raceTribe.ToKey(raceType);
 			string slotKey = slot.ToAbbreviation();
 			return $"chara/equipment/{this.SetKey}/model/{raceKey}{this.SetKey}_{slotKey}.mdl";
@@ -68,6 +71,9 @@ namespace LuminaExtensions.Excel
 
 		public override string GetModelPath(RaceTribes raceTribe, RaceTypes raceType, ItemSlots slot)
 		{
+			if (!slot.IsSlot(ItemSlots.Accessories))
+				return string.Empty;
+
 			string raceKey = raceTribe.ToKey(raceType);
 			string slotKey = slot.ToAbbreviation();
 			return $"chara/accessory/{this.SetKey}/model/{raceKey}{this.SetKey}_{slotKey}.mdl";
@@ -107,6 +113,9 @@ namespace LuminaExtensions.Excel
 
 		public override string GetModelPath(RaceTribes raceTribe, RaceTypes raceType, ItemSlots slot)
 		{
+			if (!slot.IsSlot(ItemSlots.Weapons))
+				return string.Empty;
+
 			string raceKey = raceTribe.ToKey(raceType);
 			return $"chara/weapon/{this.SetKey}/obj/body/{this.SetVaraintKey}/model/{this.SetKey}{this.SetVaraintKey}.mdl";
 		}

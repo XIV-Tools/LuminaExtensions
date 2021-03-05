@@ -34,6 +34,39 @@ namespace LuminaExtensions
 	#pragma warning disable SA1649
 	public static class ItemSlotsExtensions
 	{
+		public static bool IsSlot(this ItemSlots self, ItemSlots type)
+		{
+			if (type == ItemSlots.Equipment)
+			{
+				return self == ItemSlots.Head
+					|| self == ItemSlots.Body
+					|| self == ItemSlots.Hands
+					|| self == ItemSlots.Waist
+					|| self == ItemSlots.Legs
+					|| self == ItemSlots.Feet;
+			}
+			else if (type == ItemSlots.Accessories)
+			{
+				return self == ItemSlots.Ears
+					|| self == ItemSlots.Neck
+					|| self == ItemSlots.Wrists
+					|| self == ItemSlots.RightRing
+					|| self == ItemSlots.LeftRing;
+			}
+			else if (type == ItemSlots.Weapons)
+			{
+				return self == ItemSlots.MainHand
+					|| self == ItemSlots.OffHand;
+			}
+			else if (type == ItemSlots.Rings)
+			{
+				return self == ItemSlots.LeftRing
+					|| self == ItemSlots.RightRing;
+			}
+
+			return self == type;
+		}
+
 		public static string ToAbbreviation(this ItemSlots self)
 		{
 			switch (self)
