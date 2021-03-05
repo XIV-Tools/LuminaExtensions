@@ -16,7 +16,6 @@ namespace LuminaExtensions.Converters.TexFiles
 	{
 		public override string Name => "Direct Draw Surface";
 		public override string FileExtension => ".dds";
-		public override string ResourceExtension => ".tex";
 
 		public override void Convert(TexFileEx source, Stream destination)
 		{

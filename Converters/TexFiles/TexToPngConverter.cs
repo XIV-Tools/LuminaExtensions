@@ -21,7 +21,6 @@ namespace LuminaExtensions.Converters.TexFiles
 	{
 		public override string Name => "Image";
 		public override string FileExtension => ".png";
-		public override string ResourceExtension => ".tex";
 
 		public override void Convert(TexFileEx source, Stream destination)
 		{

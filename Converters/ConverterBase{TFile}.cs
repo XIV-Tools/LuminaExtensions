@@ -6,10 +6,13 @@ namespace LuminaExtensions.Converters
 	using System;
 	using System.IO;
 	using Lumina.Data;
+	using LuminaExtensions.Files;
 
 	public abstract class ConverterBase<TFile> : ConverterBase
 		where TFile : FileResource
 	{
+		public sealed override string ResourceExtension => FileExtensionUtility.GetFileExtension<TFile>();
+
 		public abstract void Convert(TFile source, Stream destination);
 		public abstract void ConvertBack(Stream source, TFile destination);
 
