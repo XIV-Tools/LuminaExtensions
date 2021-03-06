@@ -15,6 +15,8 @@ namespace LuminaExtensions.Types
 	[StructLayout(LayoutKind.Sequential)]
 	public struct Half
 	{
+		public static readonly Half Zero = new Half(0);
+
 		/// <summary>
 		/// Number of decimal digits of precision.
 		/// </summary>

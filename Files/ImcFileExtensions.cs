@@ -3,6 +3,7 @@
 
 namespace Lumina.Data.Files
 {
+	using System.Collections.Generic;
 	using LuminaExtensions;
 
 	public static class ImcFileExtensions
@@ -46,6 +47,21 @@ namespace Lumina.Data.Files
 		public static string GetMaterialKey(this ImcFile.ImageChangeData self)
 		{
 			return "v" + self.MaterialId.ToString().PadLeft(4, '0');
+		}
+
+		public static HashSet<string> GetallMaterialKeys(this ImcFile self)
+		{
+			HashSet<string> materialIds = new HashSet<string>();
+
+			foreach (ImcFile.ImageChangeParts part in self.GetParts())
+			{
+				foreach (ImcFile.ImageChangeData varaint in part.Variants)
+				{
+					materialIds.Add(varaint.GetMaterialKey());
+				}
+			}
+
+			return materialIds;
 		}
 	}
 }

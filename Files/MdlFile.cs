@@ -51,14 +51,7 @@ namespace LuminaExtensions.Files
 			List<string> paths = new List<string>();
 			for (int i = 0; i < pathCount; i++)
 			{
-				byte a;
-				List<byte> bytes = new List<byte>();
-				while ((a = this.Reader.ReadByte()) != 0)
-				{
-					bytes.Add(a);
-				}
-
-				paths.Add(Encoding.ASCII.GetString(bytes.ToArray()).Replace("\0", string.Empty));
+				paths.Add(this.Reader.ReadTerminatedString());
 			}
 
 			// Ensure we are at the end of the path block
@@ -202,12 +195,9 @@ namespace LuminaExtensions.Files
 				}
 			}
 
-			// Data block for attributes offset paths
-			// Not sure what attribute offsets are used for since TexTools never reads or writes them
-			for (int i = 0; i < this.Attributes.Count; i++)
-			{
-				this.Reader.ReadInt32();
-			}
+			// Skip the attribute paths offsets
+			// Since we just read all the paths then split them, we dont need the offsets.
+			this.Reader.BaseStream.Seek(this.Attributes.Count * 4, SeekOrigin.Current);
 
 			// Unknown data block
 			// No idea how this would work, since commenting it out should change the position in the read stream, but its disabled
@@ -238,19 +228,13 @@ namespace LuminaExtensions.Files
 			// Unknown data block
 			byte[] unknownData2 = this.Reader.ReadBytes(unknown9 * 12);
 
-			// Data block for material offset paths
-			// Not sure what material offsets are used for since TexTools never reads or writes them
-			for (int i = 0; i < this.Materials.Count; i++)
-			{
-				this.Reader.ReadInt32();
-			}
+			// Skip the Data block for material offset paths
+			// Since we just read all the paths then split them, we dont need the offsets.
+			this.Reader.BaseStream.Seek(this.Materials.Count * 4, SeekOrigin.Current);
 
-			// Data block for bone offset paths
-			// Not sure what bone offsets are used for since TexTools never reads or writes them
-			for (int i = 0; i < this.Bones.Count; i++)
-			{
-				this.Reader.ReadInt32();
-			}
+			// Skip the Data block for bone offset paths
+			// Since we just read all the paths then split them, we dont need the offsets.
+			this.Reader.BaseStream.Seek(this.Bones.Count * 4, SeekOrigin.Current);
 
 			// Bone Lists
 			for (int i = 0; i < boneListCount; i++)
@@ -600,7 +584,7 @@ namespace LuminaExtensions.Files
 					}
 					else if (data.DataUsage == VertexDataStruct.VertexUsageType.Color)
 					{
-						vertexData.Colors.Add(this.Reader.ReadColor());
+						vertexData.Colors.Add(this.Reader.ReadRgbaColor());
 					}
 					else if (data.DataUsage == VertexDataStruct.VertexUsageType.TextureCoordinate)
 					{

@@ -4,14 +4,42 @@
 namespace LuminaExtensions.Extensions
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Drawing;
 	using System.IO;
 	using System.Numerics;
+	using System.Text;
 	using LuminaExtensions.Files.Mdl;
 	using LuminaExtensions.Types;
 
 	public static class BinaryReaderExtensions
 	{
+		public static string ReadTerminatedString(this BinaryReader self, int size = -1)
+		{
+			List<byte> bytes = new List<byte>();
+
+			if (size <= 0)
+			{
+				bytes.Add(self.ReadByte());
+				bytes.Add(self.ReadByte());
+
+				byte a;
+				while ((a = self.ReadByte()) != 0)
+				{
+					bytes.Add(a);
+				}
+			}
+			else
+			{
+				bytes.AddRange(self.ReadBytes(size));
+			}
+
+			if (bytes.Count <= 0)
+				return string.Empty;
+
+			return Encoding.ASCII.GetString(bytes.ToArray()).Replace("\0", string.Empty);
+		}
+
 		public static Vector2 ReadVector2(this BinaryReader self)
 		{
 			return new Vector2(self.ReadSingle(), self.ReadSingle());
@@ -27,27 +55,32 @@ namespace LuminaExtensions.Extensions
 			return new Vector4(self.ReadSingle(), self.ReadSingle(), self.ReadSingle(), self.ReadSingle());
 		}
 
+		public static Half ReadHalf(this BinaryReader self)
+		{
+			return new Half(self.ReadUInt16());
+		}
+
 		public static Vector2 ReadHalf2(this BinaryReader self)
 		{
-			Half x = self.ReadUInt16();
-			Half y = self.ReadUInt16();
+			Half x = new Half(self.ReadUInt16());
+			Half y = new Half(self.ReadUInt16());
 			return new Vector2(x, y);
 		}
 
 		public static Vector3 ReadHalf3(this BinaryReader self)
 		{
-			Half x = self.ReadUInt16();
-			Half y = self.ReadUInt16();
-			Half z = self.ReadUInt16();
+			Half x = new Half(self.ReadUInt16());
+			Half y = new Half(self.ReadUInt16());
+			Half z = new Half(self.ReadUInt16());
 			return new Vector3(x, y, z);
 		}
 
 		public static Vector4 ReadHalf4(this BinaryReader self)
 		{
-			Half x = self.ReadUInt16();
-			Half y = self.ReadUInt16();
-			Half z = self.ReadUInt16();
-			Half w = self.ReadUInt16();
+			Half x = new Half(self.ReadUInt16());
+			Half y = new Half(self.ReadUInt16());
+			Half z = new Half(self.ReadUInt16());
+			Half w = new Half(self.ReadUInt16());
 			return new Vector4(x, y, z, w);
 		}
 
@@ -60,7 +93,7 @@ namespace LuminaExtensions.Extensions
 			return new Vector4(x, y, z, w);
 		}
 
-		public static Color ReadColor(this BinaryReader self)
+		public static Color ReadRgbaColor(this BinaryReader self)
 		{
 			byte r = self.ReadByte();
 			byte g = self.ReadByte();
@@ -68,6 +101,24 @@ namespace LuminaExtensions.Extensions
 			byte a = self.ReadByte();
 
 			return Color.FromArgb(a, r, g, b);
+		}
+
+		public static Color ReadRgbColor(this BinaryReader self)
+		{
+			byte r = self.ReadByte();
+			byte g = self.ReadByte();
+			byte b = self.ReadByte();
+
+			return Color.FromArgb(1, r, g, b);
+		}
+
+		public static Color ReadRgbColorHalf(this BinaryReader self)
+		{
+			Half r = self.ReadHalf();
+			Half g = self.ReadHalf();
+			Half b = self.ReadHalf();
+
+			return Color.FromArgb(1, (byte)(r * 255), (byte)(g * 255), (byte)(b * 255));
 		}
 
 		public static T ReadVertexData<T>(this BinaryReader self, VertexDataStruct.VertexDataType type)

@@ -21,6 +21,7 @@ namespace LuminaExtensions.Files
 			RegisterExtension<MdlFile>(".mdl");
 			RegisterExtension<EqdpFile>(".eqdp");
 			RegisterExtension<TexFileEx>(".tex");
+			RegisterExtension<StmFile>(".stm");
 		}
 
 		public static FileResource GetFile(LuminaMain lumina, string path)
@@ -34,6 +35,7 @@ namespace LuminaExtensions.Files
 				case ".mdl": return lumina.GetFile<MdlFile>(path);
 				case ".eqdp": return lumina.GetFile<EqdpFile>(path);
 				case ".tex": return lumina.GetFile<TexFileEx>(path);
+				case ".stm": return lumina.GetFile<StmFile>(path);
 			}
 
 			return lumina.GetFile(path);

@@ -20,15 +20,20 @@ namespace LuminaExtensions.Files.Mtrl
 {
 	using System;
 
-	/// <summary>
-	/// This class contains the information for the texture usage structs in MTRL data.
-	/// </summary>
 	[Serializable]
 	public class TextureUsageStruct
 	{
-		// Mappings for this TextureType value to XivTexType value are available in Mtrl.cs
-		public uint TextureType { get; set; }
+		public enum Types : uint
+		{
+			Normal = 4113354501,
+			Decal = 3531043187,
+			Diffuse = 3054951514,
+			Specular = 3367837167,
+			Skin = 940355280,
+			Other = 612525193,
+		}
 
+		public Types TextureType { get; set; }
 		public uint Unknown { get; set; }
 	}
 }

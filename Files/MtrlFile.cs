@@ -3,128 +3,25 @@
 
 namespace LuminaExtensions.Files
 {
+	using System;
 	using System.Collections.Generic;
+	using System.Drawing;
+	using System.Numerics;
 	using System.Text;
 	using Lumina.Data;
+	using LuminaExtensions.Extensions;
 	using LuminaExtensions.Files.Mtrl;
 	using LuminaExtensions.Types;
 
 	public class MtrlFile : FileResource
 	{
-		/// <summary>
-		/// Gets or sets the MTRL file signature.
-		/// </summary>
-		/// <remarks>
-		/// 0x00000301 (16973824).
-		/// </remarks>
-		public int Signature { get; set; }
+		public readonly List<string> TexturePaths = new List<string>();
+		public readonly List<string> MapNames = new List<string>();
+		public readonly List<string> ColorSetNames = new List<string>();
+		public readonly ColorSet ColorSet = new ColorSet();
+		public readonly List<TextureUsageStruct> TextureUsage = new List<TextureUsageStruct>();
 
-		/// <summary>
-		/// Gets or sets the size of the MTRL file.
-		/// </summary>
-		public short FileSize { get; set; }
-
-		/// <summary>
-		/// Gets or sets the size of the thiserial Data section.
-		/// </summary>
-		/// <remarks>
-		/// This is the size of the data chunk containing all of the path and filename strings.
-		/// </remarks>
-		public ushort MaterialDataSize { get; set; }
-
-		/// <summary>
-		/// Gets or sets the size of the Texture Path Data section.
-		/// </summary>
-		/// <remarks>
-		/// This is the size of the data chucnk containing only the texture paths.
-		/// </remarks>
-		public ushort TexturePathsDataSize { get; set; }
-
-		/// <summary>
-		/// Gets or sets the number of textures paths in the mtrl.
-		/// </summary>
-		public byte TextureCount { get; set; }
-
-		/// <summary>
-		/// Gets or sets the number of map paths in the mtrl.
-		/// </summary>
-		public byte MapCount { get; set; }
-
-		/// <summary>
-		/// Gets or sets the amount of color sets in the mtrl.
-		/// </summary>
-		/// <remarks>
-		/// It is not known if there are any instances where this is greater than 1.
-		/// </remarks>
-		public byte ColorSetCount { get; set; }
-
-		/// <summary>
-		/// Gets or sets the number of bytes to skip after path section.
-		/// </summary>
-		public byte UnknownDataSize { get; set; }
-
-		/// <summary>
-		/// Gets or sets a list containing the Texture Path offsets.
-		/// </summary>
-		public List<int> TexturePathOffsetList { get; set; } = new List<int>();
-
-		/// <summary>
-		/// Gets or sets a list containing the Texture Path Unknowns.
-		/// </summary>
-		public List<short> TexturePathUnknownList { get; set; } = new List<short>();
-
-		/// <summary>
-		/// Gets or sets a list containing the Map Path offsets.
-		/// </summary>
-		public List<int> MapPathOffsetList { get; set; } = new List<int>();
-
-		/// <summary>
-		/// Gets or sets a list containing the Map Path Unknowns.
-		/// </summary>
-		public List<short> MapPathUnknownList { get; set; } = new List<short>();
-
-		/// <summary>
-		/// Gets or sets a list containing the ColorSet Path offsets.
-		/// </summary>
-		public List<int> ColorSetPathOffsetList { get; set; } = new List<int>();
-
-		/// <summary>
-		/// Gets or sets a list containing the ColorSet Path Unknowns.
-		/// </summary>
-		public List<short> ColorSetPathUnknownList { get; set; } = new List<short>();
-
-		/// <summary>
-		/// Gets or sets a list containing the Texture Path strings.
-		/// </summary>
-		public List<string> TexturePaths { get; set; } = new List<string>();
-
-		/// <summary>
-		/// Gets or sets a list containing the Map Path strings.
-		/// </summary>
-		public List<string> MapPathList { get; set; } = new List<string>();
-
-		/// <summary>
-		/// Gets or sets a list containing the ColorSet Path strings.
-		/// </summary>
-		public List<string> ColorSetPathList { get; set; } = new List<string>();
-
-		/// <summary>
-		/// Gets or sets the name of the shader used by the item.
-		/// </summary>
-		public string? Shader { get; set; }
-
-		public byte[]? Unknown2 { get; set; }
-		public ushort Unknown3 { get; set; }
-
-		/// <summary>
-		/// Gets or sets the list of half floats containing the ColorSet data.
-		/// </summary>
-		public List<Half> ColorSetData { get; set; } = new List<Half>();
-
-		/// <summary>
-		/// Gets or sets the byte array containing the extra ColorSet data.
-		/// </summary>
-		public byte[]? ColorSetDyeData { get; set; }
+		public string? ShaderName;
 
 		/// <summary>
 		/// Gets or sets the shader number used by the item.
@@ -134,11 +31,6 @@ namespace LuminaExtensions.Files
 		/// Seems to be more likely that this is some base argument passed into the shader.
 		/// </remarks>
 		public ushort ShaderNumber { get; set; }
-
-		/// <summary>
-		/// Gets or sets the list of Type 1 data structures.
-		/// </summary>
-		public List<TextureUsageStruct> TextureUsageList { get; set; } = new List<TextureUsageStruct>();
 
 		/// <summary>
 		/// Gets or sets the list of Type 2 data structures.
@@ -153,7 +45,7 @@ namespace LuminaExtensions.Files
 		/// <summary>
 		/// Gets the number of type 1 data sturctures.
 		/// </summary>
-		public ushort TextureUsageCount => (ushort)this.TextureUsageList.Count;
+		public ushort TextureUsageCount => (ushort)this.TextureUsage.Count;
 
 		/// <summary>
 		/// Gets the number of type 2 data structures.
@@ -164,22 +56,6 @@ namespace LuminaExtensions.Files
 		/// Gets the number of parameter stuctures.
 		/// </summary>
 		public ushort TextureDescriptorCount => (ushort)this.TextureDescriptorList.Count;
-
-		/// <summary>
-		/// Gets the size of the ColorSet Data section.
-		/// </summary>
-		/// <remarks>
-		/// Can be 0 if there is no ColorSet Data.
-		/// </remarks>
-		public ushort ColorSetDataSize
-		{
-			get
-			{
-				int size = this.ColorSetData.Count * 2;
-				size += this.ColorSetDyeData == null ? 0 : this.ColorSetDyeData.Length;
-				return (ushort)size;
-			}
-		}
 
 		/// <summary>
 		/// Gets the size of the additional MTRL Data.
@@ -203,163 +79,106 @@ namespace LuminaExtensions.Files
 
 		public override void LoadFile()
 		{
+			base.LoadFile();
+
 			this.Reader.BaseStream.Position = 0;
 
 			int signature = this.Reader.ReadInt32();
 			int fileSize = this.Reader.ReadInt16();
 
 			ushort colorSetDataSize = this.Reader.ReadUInt16();
-			this.MaterialDataSize = this.Reader.ReadUInt16();
-			this.TexturePathsDataSize = this.Reader.ReadUInt16();
-			this.TextureCount = this.Reader.ReadByte();
-			this.MapCount = this.Reader.ReadByte();
-			this.ColorSetCount = this.Reader.ReadByte();
-			this.UnknownDataSize = this.Reader.ReadByte();
+			ushort materialDataSize = this.Reader.ReadUInt16();
+			ushort texturePathsDataSize = this.Reader.ReadUInt16();
+			byte textureCount = this.Reader.ReadByte();
+			byte mapCount = this.Reader.ReadByte();
+			byte colorSetCount = this.Reader.ReadByte();
+			byte unknownDataSize = this.Reader.ReadByte();
 
-			List<int> pathSizeList = new List<int>();
+			int stringCount = textureCount + mapCount + colorSetCount;
+			long stringBlockOffset = 10 + (stringCount * 2);
 
-			// get the texture path offsets
-			this.TexturePathOffsetList = new List<int>(this.TextureCount);
-			this.TexturePathUnknownList = new List<short>(this.TextureCount);
-			for (int i = 0; i < this.TextureCount; i++)
+			// TODO: Dont skip the offsets! some materials have empty texture paths in them, and
+			// we need to handle those cases.
+			// Skip over the path offsets and just read all the string at once
+			this.Reader.BaseStream.Seek(stringBlockOffset, System.IO.SeekOrigin.Current);
+			List<string> strings = new List<string>();
+			for (int i = 0; i < stringCount; i++)
 			{
-				this.TexturePathOffsetList.Add(this.Reader.ReadInt16());
-				this.TexturePathUnknownList.Add(this.Reader.ReadInt16());
-
-				// add the size of the paths
-				if (i > 0)
-				{
-					pathSizeList.Add(this.TexturePathOffsetList[i] - this.TexturePathOffsetList[i - 1]);
-				}
+				string str = this.Reader.ReadTerminatedString();
+				strings.Add(str);
 			}
 
-			// get the map path offsets
-			this.MapPathOffsetList = new List<int>(this.MapCount);
-			this.MapPathUnknownList = new List<short>(this.MapCount);
-			for (int i = 0; i < this.MapCount; i++)
-			{
-				this.MapPathOffsetList.Add(this.Reader.ReadInt16());
-				this.MapPathUnknownList.Add(this.Reader.ReadInt16());
+			int index = 0;
+			index = strings.CopyTo(this.TexturePaths, index, textureCount);
+			index = strings.CopyTo(this.MapNames, index, mapCount);
+			index = strings.CopyTo(this.ColorSetNames, index, colorSetCount);
 
-				// add the size of the paths
-				if (i > 0)
+			int shaderNameSize = materialDataSize - texturePathsDataSize;
+			this.ShaderName = this.Reader.ReadTerminatedString(shaderNameSize);
+
+			if (!this.ShaderName.EndsWith(".shpk"))
+				throw new Exception("Failed to read valid shader name");
+
+			byte[] unknown2 = this.Reader.ReadBytes(unknownDataSize);
+
+			if (colorSetDataSize > 0)
+			{
+				for (int x = 0; x < 16; x++)
 				{
-					pathSizeList.Add(this.MapPathOffsetList[i] - this.MapPathOffsetList[i - 1]);
+					this.ColorSet.Rows[x] = new ColorSet.Row();
+					this.ColorSet.Rows[x].Diffuse = this.Reader.ReadRgbColorHalf();
+					this.ColorSet.Rows[x].SpecularPower = this.Reader.ReadHalf();
+					this.ColorSet.Rows[x].Specular = this.Reader.ReadRgbColorHalf();
+					this.ColorSet.Rows[x].Gloss = this.Reader.ReadHalf();
+					this.ColorSet.Rows[x].Emissive = this.Reader.ReadRgbColorHalf();
+
+					// Tile material is a half, but is floored into one of 64 possible values.
+					this.ColorSet.Rows[x].TileMaterial = (byte)Math.Floor(this.Reader.ReadHalf() * 64.0);
+
+					// tile transform is in X, SkewX, SkewY, Y.
+					Half tileX = this.Reader.ReadHalf();
+					Half tileSkewX = this.Reader.ReadHalf();
+					Half tileSkewY = this.Reader.ReadHalf();
+					Half tileY = this.Reader.ReadHalf();
+
+					this.ColorSet.Rows[x].Tile = new Vector2(tileX, tileY);
+					this.ColorSet.Rows[x].TileSkew = new Vector2(tileSkewX, tileSkewY);
 				}
-				else
+
+				// If the color set is 544 in length, it has dye info for each row.
+				if (colorSetDataSize == 544)
 				{
-					if (this.TextureCount > 0)
+					for (int x = 0; x < 16; x++)
 					{
-						pathSizeList.Add(this.MapPathOffsetList[i] -
-										 this.TexturePathOffsetList[this.TextureCount - 1]);
+						ushort dyeData = this.Reader.ReadUInt16();
+
+						this.ColorSet.Rows[x].DyeTemplate = (ushort)(dyeData >> 5);
+
+						this.ColorSet.Rows[x].DyeFlag |= (dyeData & 1) != 0 ? ColorSet.Row.DyeFlags.Diffuse : 0;
+						this.ColorSet.Rows[x].DyeFlag |= (dyeData & 2) != 0 ? ColorSet.Row.DyeFlags.Specular : 0;
+						this.ColorSet.Rows[x].DyeFlag |= (dyeData & 4) != 0 ? ColorSet.Row.DyeFlags.Emissive : 0;
+						this.ColorSet.Rows[x].DyeFlag |= (dyeData & 8) != 0 ? ColorSet.Row.DyeFlags.Gloss : 0;
+
+						// TexTools has specular power as 0x10 instead of 1x16 but that doesn't make sense, so its 0x16 here.
+						this.ColorSet.Rows[x].DyeFlag |= (dyeData & 16) != 0 ? ColorSet.Row.DyeFlags.SpecularPower : 0;
 					}
 				}
 			}
 
-			// get the color set offsets
-			this.ColorSetPathOffsetList = new List<int>(this.ColorSetCount);
-			this.ColorSetPathUnknownList = new List<short>(this.ColorSetCount);
-			for (int i = 0; i < this.ColorSetCount; i++)
-			{
-				this.ColorSetPathOffsetList.Add(this.Reader.ReadInt16());
-				this.ColorSetPathUnknownList.Add(this.Reader.ReadInt16());
-
-				// add the size of the paths
-				if (i > 0)
-				{
-					pathSizeList.Add(this.ColorSetPathOffsetList[i] -
-									 this.ColorSetPathOffsetList[i - 1]);
-				}
-				else
-				{
-					pathSizeList.Add(this.ColorSetPathOffsetList[i] -
-									 this.MapPathOffsetList[this.MapCount - 1]);
-				}
-			}
-
-			pathSizeList.Add(this.TexturePathsDataSize -
-							 this.ColorSetPathOffsetList[this.ColorSetCount - 1]);
-
-			int count = 0;
-
-			// get the texture path strings
-			this.TexturePaths = new List<string>(this.TextureCount);
-			for (int i = 0; i < this.TextureCount; i++)
-			{
-				string texturePath = Encoding.UTF8.GetString(this.Reader.ReadBytes(pathSizeList[count]));
-				texturePath = texturePath.Replace("\0", string.Empty);
-
-				if (string.IsNullOrEmpty(texturePath))
-					continue;
-
-				////string dx11FileName = Path.GetFileName(texturePath).Insert(0, "--");
-				////if (await index.FileExists(Path.GetDirectoryName(texturePath).Replace("\\", "/") + "/" + dx11FileName, df))
-				////{
-				////texturePath = texturePath.Insert(texturePath.LastIndexOf("/") + 1, "--");
-				////}
-
-				this.TexturePaths.Add(texturePath);
-				count++;
-			}
-
-			// get the map path strings
-			this.MapPathList = new List<string>(this.MapCount);
-			for (int i = 0; i < this.MapCount; i++)
-			{
-				this.MapPathList.Add(Encoding.UTF8.GetString(this.Reader.ReadBytes(pathSizeList[count]))
-					.Replace("\0", string.Empty));
-				count++;
-			}
-
-			// get the color set path strings
-			this.ColorSetPathList = new List<string>(this.ColorSetCount);
-			for (int i = 0; i < this.ColorSetCount; i++)
-			{
-				this.ColorSetPathList.Add(Encoding.UTF8.GetString(this.Reader.ReadBytes(pathSizeList[count]))
-					.Replace("\0", string.Empty));
-				count++;
-			}
-
-			int shaderPathSize = this.MaterialDataSize - this.TexturePathsDataSize;
-
-			this.Shader = Encoding.UTF8.GetString(this.Reader.ReadBytes(shaderPathSize)).Replace("\0", string.Empty);
-			this.Unknown2 = this.Reader.ReadBytes(this.UnknownDataSize);
-
-			this.ColorSetData = new List<Half>();
-			this.ColorSetDyeData = null;
-			if (colorSetDataSize > 0)
-			{
-				// Color Data is always 512 (6 x 14 = 64 x 8bpp = 512)
-				int colorDataSize = 512;
-
-				for (int i = 0; i < colorDataSize / 2; i++)
-				{
-					this.ColorSetData.Add(new Half(this.Reader.ReadUInt16()));
-				}
-
-				// If the color set is 544 in length, it has an extra 32 bytes at the end
-				if (colorSetDataSize == 544)
-				{
-					this.ColorSetDyeData = this.Reader.ReadBytes(32);
-				}
-			}
-
 			ushort originalShaderParameterDataSize = this.Reader.ReadUInt16();
-			ushort originalTextureUsageCount = this.Reader.ReadUInt16();
+			ushort textureUsageCount = this.Reader.ReadUInt16();
 			ushort originalShaderParameterCount = this.Reader.ReadUInt16();
 			ushort originalTextureDescriptorCount = this.Reader.ReadUInt16();
 
 			this.ShaderNumber = this.Reader.ReadUInt16();
-			this.Unknown3 = this.Reader.ReadUInt16();
+			ushort unknown3 = this.Reader.ReadUInt16();
 
-			this.TextureUsageList = new List<TextureUsageStruct>((int)originalTextureUsageCount);
-			for (int i = 0; i < originalTextureUsageCount; i++)
+			for (int i = 0; i < textureUsageCount; i++)
 			{
-				this.TextureUsageList.Add(new TextureUsageStruct
-				{
-					TextureType = this.Reader.ReadUInt32(),
-					Unknown = this.Reader.ReadUInt32(),
-				});
+				TextureUsageStruct usage = new TextureUsageStruct();
+				usage.TextureType = (TextureUsageStruct.Types)this.Reader.ReadUInt32();
+				uint unknown = this.Reader.ReadUInt32();
+				this.TextureUsage.Add(usage);
 			}
 
 			this.ShaderParameterList = new List<ShaderParameterStruct>(originalShaderParameterCount);
@@ -413,8 +232,6 @@ namespace LuminaExtensions.Files
 				this.Reader.ReadByte();
 				bytesRead++;
 			}
-
-			base.LoadFile();
 		}
 	}
 }
