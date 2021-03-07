@@ -158,8 +158,6 @@ namespace LuminaExtensions.Files
 						this.ColorSet.Rows[x].DyeFlag |= (dyeData & 2) != 0 ? ColorSet.Row.DyeFlags.Specular : 0;
 						this.ColorSet.Rows[x].DyeFlag |= (dyeData & 4) != 0 ? ColorSet.Row.DyeFlags.Emissive : 0;
 						this.ColorSet.Rows[x].DyeFlag |= (dyeData & 8) != 0 ? ColorSet.Row.DyeFlags.Gloss : 0;
-
-						// TexTools has specular power as 0x10 instead of 1x16 but that doesn't make sense, so its 0x16 here.
 						this.ColorSet.Rows[x].DyeFlag |= (dyeData & 16) != 0 ? ColorSet.Row.DyeFlags.SpecularPower : 0;
 					}
 				}
